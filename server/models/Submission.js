@@ -10,8 +10,12 @@ const submissionSchema = new mongoose.Schema({
   city: { type: String, required: true },
   state: { type: String, required: true },
   pinCode: { type: String, required: true },
-  dateOfSubmission: { type: Date, default: Date.now },
-  remarks: { type: String },
+  dateOfSubmission: {
+    type: String,
+    default: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
+  },
+  remarks: { type: String, default: "Not Applicable" },
+  pdfLink: { type: String },
 });
 
-export default Submission = mongoose.model("Submission", submissionSchema);
+export default mongoose.model("Submission", submissionSchema);
