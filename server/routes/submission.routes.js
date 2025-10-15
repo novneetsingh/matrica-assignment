@@ -7,13 +7,14 @@ import pdf from "html-pdf-node";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import cloudinary from "../config/cloudinary.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = Router();
 
-// POST /submit route (fixed)
+// submit form
 router.post("/submit", async (req, res) => {
   try {
     const {
@@ -49,16 +50,18 @@ router.post("/submit", async (req, res) => {
     const savedSubmission = await Submission.create({ ...req.body });
 
     // 3. Load the DOCX template
-    const templatePath = path.resolve(
+    const docxTemplatePath = path.resolve(
       __dirname,
       "..",
       "templates",
       "Matrica_Intern_Assignment_Template.docx"
     );
-    const content = fs.readFileSync(templatePath, "binary");
+
+    const docxContent = fs.readFileSync(docxTemplatePath, "binary");
 
     // 4. Initialize PizZip and Docxtemplater
-    const zip = new PizZip(content);
+    const zip = new PizZip(docxContent);
+
     const doc = new Docxtemplater(zip, {
       delimiters: { start: "{{", end: "}}" },
       paragraphLoop: true,
@@ -103,12 +106,25 @@ router.post("/submit", async (req, res) => {
 
     const pdfBuffer = await pdf.generatePdf(file, options);
 
-    // 11. Save PDF
+    // 10. Save PDF to file
     fs.writeFileSync(pdfFilePath, pdfBuffer);
 
-    // 12. Respond
+    // 11. Save PDF in cloudinary
+    const result = await cloudinary.uploader.upload(pdfFilePath, {
+      resource_type: "auto",
+      folder: process.env.FOLDER_NAME,
+    });
+
+    // 12. Remove temporary pdf file
+    fs.unlinkSync(pdfFilePath);
+
+    // 13. Update submission with PDF URL
+    savedSubmission.pdfLink = result.secure_url;
+    await savedSubmission.save();
+
     res.status(201).json({
       message: "Submission saved and PDF generated!",
+      data: savedSubmission,
     });
   } catch (error) {
     console.error("Error processing submission:", error);
@@ -121,9 +137,7 @@ router.post("/submit", async (req, res) => {
 // get all submissions
 router.get("/getAllSubmissions", async (req, res) => {
   try {
-    const submissions = await Submission.find()
-      .sort({ dateOfSubmission: -1 })
-      .lean();
+    const submissions = await Submission.find().lean();
 
     res.status(200).json({
       message:
