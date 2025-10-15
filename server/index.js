@@ -2,6 +2,7 @@ import express from "express";
 import "dotenv/config";
 import cors from "cors";
 import submissionRoutes from "./routes/submission.routes.js";
+import { dbconnect } from "./config/db.js";
 
 const app = express();
 
@@ -11,6 +12,9 @@ app.use(
     origin: process.env.FRONTEND_URL,
   })
 );
+
+//database connection
+dbconnect();
 
 app.get("/", (req, res) => {
   res.send("welcome to matrica assignment server");
