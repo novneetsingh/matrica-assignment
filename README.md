@@ -54,7 +54,7 @@ matrica-assignment/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/novneetsingh/delivery-management-system.git
+   git clone https://github.com/novneetsingh/matrica-assignment.git
    cd matrica-assignment
    ```
 
