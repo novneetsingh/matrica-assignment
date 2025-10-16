@@ -2,6 +2,10 @@
 
 A full-stack web application for handling submissions, built with a React frontend and a Node.js backend. This project appears to be designed for managing assignment submissions, including file uploads and data processing.
 
+## Live Demo :
+
+https://matrica-assignment.onrender.com
+
 ## Features
 
 - **Frontend**: Modern React application with Vite for fast development
@@ -50,7 +54,7 @@ matrica-assignment/
 1. **Clone the repository:**
 
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/novneetsingh/delivery-management-system.git
    cd matrica-assignment
    ```
 
